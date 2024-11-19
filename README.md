@@ -20,12 +20,12 @@ This project provides a complete setup for deploying a two-tier Python-based app
 
 ## Prerequisites
 Ensure you have the following installed on your system
-    - Terraform
-    - AWS CLI
-    - kubectl
-    - Docker
-    - ArgoCD server
-    - ArgoCD CLI
+- Terraform
+- AWS CLI
+- kubectl
+- Docker
+- ArgoCD server
+- ArgoCD CLI
 
 ## Setup Instructions
 
