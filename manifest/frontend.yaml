@@ -20,11 +20,11 @@ spec:
           image: 571515939637.dkr.ecr.ap-southeast-1.amazonaws.com/frontend:5d6ef58
           resources:
             limits:
-              memory: "512Mi"
-              cpu: "500m"
-            requests:
               memory: "256Mi"
-              cpu: "250m"
+              cpu: "100m"
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
           ports:
             - containerPort: 5001
 ---

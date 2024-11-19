@@ -29,7 +29,7 @@ Ensure you have the following installed on your system
 
 ## Setup Instructions
 
-### AWS Configuration: Assume you have an AWS account with fully permission
+### AWS Configuration: Assume you have an AWS account with full permissions
 1. Configure AWS credentials:
 ```
 aws configure
@@ -74,11 +74,11 @@ docker push <ecr-repo-frontend>:<tag>
 ```
 
 ### Update image tag for ArgoCD sync application with EKS cluster (refer: `update-web-app-deployment` workflow job)
-Navigate to the `manifest` folder, and update every imageTag with latest pushed image
+Navigate to the `manifest` folder, and update the image tags with the latest pushed images
 
 ##Setup GitOps with ArgoCD
 
-1. Install ArgoCD on EKS (or local machine, using Docker and minikube)
+1. Install ArgoCD on EKS (or on your local machine, using Docker and minikube)
 2. Sync your application using the ArgoCD configuration in `argocd`:
 ```
 kubectl apply -f argocd.yaml
