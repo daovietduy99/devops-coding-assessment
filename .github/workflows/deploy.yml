@@ -1,0 +1,166 @@
+name: Deploy EKS
+on:
+  push:
+    branches:
+      - "main"
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  EKS-deploy:
+    name: Provision EKS infrastructure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::571515939637:role/infra_assessment
+          aws-region: ap-southeast-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.7.0
+
+      - name: Terraform Init
+        run: |
+          cd infra/EKS
+          terraform init -var-file "variables-dev.tfvars" -backend-config "key=eks.tfstate"
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          cd infra/EKS
+          terraform plan -var-file "variables-dev.tfvars" -out=tfplan
+
+      - name: Terraform Apply
+        id: apply
+        run: |
+          cd infra/EKS
+          terraform apply tfplan
+
+  ECR-deploy:
+    name: Provision ECR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::571515939637:role/infra_assessment
+          aws-region: ap-southeast-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.7.0
+
+      - name: Terraform Init
+        run: |
+          cd infra/ECR
+          terraform init -var-file "variables-dev.tfvars" -backend-config "key=ecr.tfstate"
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          cd infra/ECR
+          terraform plan -var-file "variables-dev.tfvars" -out=tfplan
+
+      - name: Terraform Apply
+        id: apply
+        run: |
+          cd infra/ECR
+          terraform apply tfplan
+
+      # ## Get terraform output and update to env-vars
+      # - name: Get ECR URL
+      #   id: ecr
+      #   run: |
+      #     cd infra/ECR
+      #     terraform output -json > ecr.json
+      #     echo "ECR_URL=$(jq -r '.ecr_url.value' ecr.json)" >> $GITHUB_ENV
+      #     echo "ECR_REPOSITORY=$(jq -r '.ecr_repository.value' ecr.json)" >> $GITHUB_ENV
+
+  build:
+    name: Build and push Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::571515939637:role/infra_assessment
+          aws-region: ap-southeast-1
+
+      - name: setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: install python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install PyGithub
+          pip install -r app/pmo/requirements.txt
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          region: ap-southeast-1
+
+      - name: Set short git commit SHA and github tag to make decision whether build is for release or not
+        id: vars
+        run: |
+          calculatedSha=$(git rev-parse --short ${{ github.sha }})
+          echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
+  
+      - name: Print env vars
+        run: |
+          echo "COMMIT_SHORT_SHA='${{ env.COMMIT_SHORT_SHA }}'"
+          echo "github.ref='${{ github.ref }}'"
+          echo "github.event.base_ref='${{ github.event.base_ref }}'"
+  
+      - name: Build web-app image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: webserver
+          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
+        run: |
+          # Build Docker image
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile ./backend/web-app
+          
+      - name: Push web-app to Amazon ECR
+        id: build-web-app-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: webserver
+          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
+        run: |
+          # Push Docker image to Amazon ECR
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Build app image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: appserver
+          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
+        run: |
+          # Build Docker image
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile ./backend/app-server
+        
+      - name: Push app to Amazon ECR
+        id: build-app-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: appserver
+          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
+        run: |
+          # Push Docker image to Amazon ECR
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+  
