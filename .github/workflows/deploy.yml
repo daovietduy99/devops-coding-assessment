@@ -171,7 +171,7 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
   
   update-web-app-deployment:
-    needs: [build-webapp, build-app-server]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
