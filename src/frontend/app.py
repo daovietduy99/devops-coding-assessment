@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import requests
+import socket
 
 app = Flask(__name__)
 
@@ -10,6 +11,7 @@ def home():
     try:
         response = requests.get(f"{BACKEND_URL}/data")
         data = response.json()
+        hostname = socket.gethostname()
     except Exception as e:
         data = {"error": str(e)}
     return render_template("index.html", data=data)
