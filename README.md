@@ -37,11 +37,11 @@ aws configure
 2. Ensure you have an IAM role with sufficient permissions to provision resources on AWS
 
 ### Step 1: Prepare credentials for infrastructure
-1. Create an IAM role that used by Github Action to provision the infrastructure (run terraform)
+1. Create an IAM role to be used by GitHub Actions for provisioning the infrastructure (running Terraform):
     - Trusted entity type: Web Identity
-    - identity provider: provide necessary github information (github org, repo, branch,...)
-    - Permission policies: assign proper policies (EKS/EC2/ECR/IAM,...)
-2. Update the workflow with the steps run terraform using that IAM role:
+    - identity provider: Provide necessary GitHub information (GitHub org, repo, branch, etc.)
+    - Permission policies: Assign appropriate policies (EKS, EC2, ECR, IAM, etc.)
+2. Update the workflow to use this IAM role for Terraform steps:
 ```
 - name: Configure AWS credentials
     uses: aws-actions/configure-aws-credentials@v4
