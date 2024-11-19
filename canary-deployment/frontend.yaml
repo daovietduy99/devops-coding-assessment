@@ -28,7 +28,7 @@ spec:
               memory: "128Mi"
               cpu: "50m"
           ports:
-            - containerPort: 5002
+            - containerPort: 5001
 
 ---
 apiVersion: apps/v1
@@ -68,7 +68,7 @@ metadata:
   name: canary
 spec:
   ports:
-    - port: 5001
+    - port: 5002
       targetPort: 5001
   selector:
     app: canary
