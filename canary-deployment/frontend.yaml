@@ -4,17 +4,17 @@ kind: Deployment
 metadata:
   name: frontend-stable
   labels:
-    app: frontend
+    app: canary
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: frontend
+      app: canary
       version: stable
   template:
     metadata:
       labels:
-        app: frontend
+        app: canary
         version: stable
     spec:
       containers:
@@ -36,17 +36,17 @@ kind: Deployment
 metadata:
   name: frontend-canary
   labels:
-    app: frontend
+    app: canary
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: frontend
+      app: canary
       version: canary
   template:
     metadata:
       labels:
-        app: frontend
+        app: canary
         version: canary
     spec:
       containers:
@@ -65,12 +65,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend
-  namespace: canary
+  name: canary
 spec:
   ports:
     - port: 5001
       targetPort: 5001
   selector:
-    app: frontend
+    app: canary
   type: LoadBalancer
