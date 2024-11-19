@@ -14,6 +14,7 @@ This project provides a complete setup for deploying a two-tier Python-based app
 │   ├── frontend/   # Frontend Python app with Flask (UI service)
 │   └── database/   # MySQL initialization script
 ├── manifest/       # Kubernetes manifests to deploy the app on EKS
+├── canary-deployment   # The manifest to deploy a canary deployment
 ├── argocd/         # ArgoCD configurations for GitOps-based app sync
 └── README.md       # Project documentation
 ```
@@ -79,7 +80,7 @@ Navigate to the `manifest` folder, and update the image tags with the latest pus
 ##Setup GitOps with ArgoCD
 
 1. Install ArgoCD on EKS (or on your local machine, using Docker and minikube)
-2. Sync your application using the ArgoCD configuration in `argocd`:
+2. Sync your code-based with k8s cluster using the ArgoCD configuration in `argocd`:
 ```
 kubectl apply -f argocd.yaml
 ```
