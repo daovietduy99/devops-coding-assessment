@@ -204,5 +204,5 @@ jobs:
           sed -i 's|image: '${{ env.ECR_REGISTRY }}/appserver':.*|image: '${{ env.ECR_REGISTRY }}/appserver':'"$IMAGE_TAG"'|' argocd/manifest/app-server.yml
           sed -i 's|image: '${{ env.ECR_REGISTRY }}/webserver':.*|image: '${{ env.ECR_REGISTRY }}/webserver':'"$IMAGE_TAG"'|' argocd/manifest/web-app.yml
           git add argocd/manifest
-          git commit -m "Update image version to $IMAGE_TAG"
-          git push
+          git commit -m "Update image versions to $IMAGE_TAG"
+          git push -u orgin main
