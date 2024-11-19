@@ -43,10 +43,30 @@ metadata:
   namespace: web-app-namespace
   name: app-server-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: app-server
   ports:
     - protocol: TCP
       port: 8080
       targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-app-to-app-server
+  namespace: web-app-namespace
+spec:
+  podSelector:
+    matchLabels:
+      app: app-server
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: web-app
+      ports:
+        - protocol: TCP
+          port: 8080
+  policyTypes:
+    - Ingress

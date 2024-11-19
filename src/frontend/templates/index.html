@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Visualization</title>
+</head>
+<body>
+    <h1>Data from Backend</h1>
+    {% if data.error %}
+        <p>Error: {{ data.error }}</p>
+    {% else %}
+        <ul>
+        {% for item in data %}
+            <li>{{ item['name'] }}: {{ item['value'] }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    <hr>
+    <h2>Add Data</h2>
+    <form method="post" action="/add">
+        <label for="name">Name:</label>
+        <input type="text" name="name" required>
+        <label for="value">Value:</label>
+        <input type="number" name="value" step="0.01" required>
+        <button type="submit">Add</button>
+    </form>
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+</body>
+</html>
