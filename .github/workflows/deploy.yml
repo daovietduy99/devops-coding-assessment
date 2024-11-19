@@ -1,10 +1,16 @@
-name: Deploy EKS
+name: CI/CD pipelines
 on:
   push:
     branches:
       - "main"
+    tags:
+      - "v*.*.*"
+    
     paths-ignore:
       - 'argocd/**'
+      - 'manifest/**'
+      - 'README.md'
+
 permissions:
   id-token: write
   contents: read
@@ -111,8 +117,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install PyGithub
-          pip install -r backend/web-app/requirements.txt
-          pip install -r backend/app-server/requirements.txt
+          pip install -r src/frontend/requirements.txt
+          pip install -r src/backend/requirements.txt
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -124,57 +130,74 @@ jobs:
         id: vars
         run: |
           echo "::set-output name=sha::$(git rev-parse --short=7 ${{ github.sha }})"
-          echo "COMMIT_SHORT_SHA=$(git rev-parse --short=7 ${{ github.sha }})" >> $GITHUB_ENV
-  
+          
       - name: Print env vars
         run: |
-          echo "COMMIT_SHORT_SHA='${{ env.COMMIT_SHORT_SHA }}'"
           echo "github.ref='${{ github.ref }}'"
           echo "github.event.base_ref='${{ github.event.base_ref }}'"
   
+      - name: Prepare Docker Tags
+        id: docker-tags
+        run: |
+          COMMIT_SHA=${{ steps.vars.outputs.sha }}
+          echo "COMMIT_SHA_TAG=$COMMIT_SHA" >> $GITHUB_ENV
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION_TAG=${GITHUB_REF/refs\/tags\//}
+            echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_ENV
+            TAGS="$VERSION_TAG,$COMMIT_SHA"
+          else
+            TAGS="$COMMIT_SHA"
+          fi
+          echo "DOCKER_IMAGE_TAGS=$TAGS" >> $GITHUB_ENV
+
       - name: Build frontend image
         id: build-frontend-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: frontend
-          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
         run: |
           # Build Docker image
           cd src/frontend
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY -f Dockerfile .
           
       - name: Push frontend to Amazon ECR
         id: push-frontend-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: frontend
-          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
         run: |
           # Push Docker image to Amazon ECR
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          IFS=',' read -ra TAGS <<< "$DOCKER_IMAGE_TAGS"
+          for TAG in "${TAGS[@]}"; do
+            docker tag $ECR_REGISTRY/$ECR_REPOSITORY $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
+          done
 
       - name: Build backend image
         id: build-backend-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: backend
-          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
         run: |
           # Build Docker image
           cd src/backend
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY -f Dockerfile .
         
       - name: Push backend to Amazon ECR
         id: push-backend-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: backend
-          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
         run: |
           # Push Docker image to Amazon ECR
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-  
+          IFS=',' read -ra TAGS <<< "$DOCKER_IMAGE_TAGS"
+          for TAG in "${TAGS[@]}"; do
+            docker tag $ECR_REGISTRY/$ECR_REPOSITORY $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
+          done
+
   update-web-app-deployment:
+    name: Bump image versions
     needs: [build]
     permissions:
       contents: write

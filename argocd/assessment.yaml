@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: "https://github.com/daovietduy99/devops-coding-assessment.git"
-    path: argocd/argocd-app
+    path: argocd
     targetRevision: main
   destination:
     server: "https://kubernetes.default.svc"

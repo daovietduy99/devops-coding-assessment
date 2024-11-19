@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql-db
+  namespace: canary
   labels:
     app: mysql-db
 spec:
@@ -47,6 +48,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mysql-db
+  namespace: canary
 spec:
   ports:
     - port: 3306
@@ -69,6 +71,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: mysql-init-script
+  namespace: canary
 data:
   init.sql: |
     CREATE DATABASE IF NOT EXISTS demo_db;
