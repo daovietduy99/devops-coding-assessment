@@ -122,8 +122,8 @@ jobs:
       - name: Set short git commit SHA and github tag to make decision whether build is for release or not
         id: vars
         run: |
-          calculatedSha=$(git rev-parse --short ${{ github.sha }})
-          echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
+          echo "::set-output name=sha::$(git rev-parse --short=7 ${{ github.sha }})"
+          echo "COMMIT_SHORT_SHA=$(git rev-parse --short=7 ${{ github.sha }})" >> $GITHUB_ENV
   
       - name: Print env vars
         run: |
@@ -187,13 +187,13 @@ jobs:
 
       - name: Update Deployment Image
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ needs.build.outputs.ecr_registry }}
           IMAGE_TAG: ${{ needs.build.outputs.sha }}
         run: |
           git pull --rebase origin main
           IMAGE_TAG=${{ needs.build.outputs.sha }}
-          sed -i 's|image: '${{ needs.build.outputs.ecr_registry }}/appserver':.*|image: '${{ needs.build.outputs.ecr_registry }}/appserver':'"$IMAGE_TAG"'|' argocd/manifest/app-server.yml
-          sed -i 's|image: '${{ needs.build.outputs.ecr_registry }}/webserver':.*|image: '${{ needs.build.outputs.ecr_registry }}/webserver':'"$IMAGE_TAG"'|' argocd/manifest/web-app.yml
+          sed -i 's|image: '${{ env.ECR_REGISTRY }}/appserver':.*|image: '${{ env.ECR_REGISTRY }}/appserver':'"$IMAGE_TAG"'|' argocd/manifest/app-server.yml
+          sed -i 's|image: '${{ env.ECR_REGISTRY }}/webserver':.*|image: '${{ env.ECR_REGISTRY }}/webserver':'"$IMAGE_TAG"'|' argocd/manifest/web-app.yml
           git add argocd/manifest
           git commit -m "Update image versions to $IMAGE_TAG"
           git push -u origin main
