@@ -36,9 +36,9 @@ spec:
             - name: init-script
               mountPath: /docker-entrypoint-initdb.d
       volumes:
-        - name: mysql-data
-          persistentVolumeClaim:
-            claimName: mysql-pvc
+        # - name: mysql-data
+        #   persistentVolumeClaim:
+        #     claimName: mysql-pvc
         - name: init-script
           configMap:
             name: mysql-init-script
@@ -54,17 +54,17 @@ spec:
   selector:
     app: mysql
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: mysql-pvc
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Gi
+# ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
