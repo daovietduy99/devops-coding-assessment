@@ -24,7 +24,7 @@
 #   service_account_role_arn = aws_iam_role.vpc_cni_role.arn
 # }
 
-# resource "aws_eks_addon" "eks-pod-identity-agent" {
-#   cluster_name          = var.cluster_name
-#   addon_name            = "eks-pod-identity-agent"
-# }
+resource "aws_eks_addon" "eks-pod-identity-agent" {
+  cluster_name          = var.cluster_name
+  addon_name            = "eks-pod-identity-agent"
+}
