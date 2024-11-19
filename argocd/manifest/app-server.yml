@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: app-server
-          image: 571515939637.dkr.ecr.ap-southeast-1.amazonaws.com/appserver:4744cdd
+          image: 571515939637.dkr.ecr.ap-southeast-1.amazonaws.com/appserver:075a473
           ports:
             - containerPort: 8080
           resources:
