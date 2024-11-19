@@ -195,8 +195,8 @@ jobs:
         run: |
           git pull --rebase origin main
           IMAGE_TAG=${{ needs.build.outputs.sha }}
-          sed -i 's|image: '${{ env.ECR_REGISTRY }}/backend':.*|image: '${{ env.ECR_REGISTRY }}/backend':'"$IMAGE_TAG"'|' argocd/manifest/app-server.yml
-          sed -i 's|image: '${{ env.ECR_REGISTRY }}/frontend':.*|image: '${{ env.ECR_REGISTRY }}/frontend':'"$IMAGE_TAG"'|' argocd/manifest/web-app.yml
+          sed -i 's|image: '${{ env.ECR_REGISTRY }}/backend':.*|image: '${{ env.ECR_REGISTRY }}/backend':'"$IMAGE_TAG"'|' manifest/backend.yml
+          sed -i 's|image: '${{ env.ECR_REGISTRY }}/frontend':.*|image: '${{ env.ECR_REGISTRY }}/frontend':'"$IMAGE_TAG"'|' manifest/frontend.yml
           git add argocd/manifest
           git commit -m "Update image versions to $IMAGE_TAG"
           git push -u origin main
