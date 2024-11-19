@@ -5,6 +5,7 @@ on:
       - "main"
     paths-ignore:
       - 'argocd/**'
+      - 'manifest/**'
 permissions:
   id-token: write
   contents: read

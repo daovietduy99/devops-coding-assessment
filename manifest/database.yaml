@@ -31,8 +31,8 @@ spec:
               memory: "256Mi"
               cpu: "250m"
           volumeMounts:
-            - name: mysql-data
-              mountPath: /var/lib/mysql
+            # - name: mysql-data
+            #   mountPath: /var/lib/mysql
             - name: init-script
               mountPath: /docker-entrypoint-initdb.d
       volumes:
