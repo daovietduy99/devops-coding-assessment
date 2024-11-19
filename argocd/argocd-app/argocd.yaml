@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: "https://github.com/daovietduy99/devops-coding-assessment.git"
+    path: argo-cd
+    targetRevision: main
+  destination:
+    name: "eks-dev"
+    namespace: argocd
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
