@@ -1,32 +1,23 @@
 from flask import Flask, render_template, request
 import requests
 import socket
-import subprocess
 
 app = Flask(__name__)
 
 BACKEND_URL = "http://backend:5500"
 
-def get_docker_image_version():
-    # Replace 'your-image-name' with the actual Docker image name
-    image_name = "your-image-name"
-    try:
-        # Get the image version using `docker images`
-        result = subprocess.check_output(
-            ["docker", "images", "--format", "{{.Tag}}", image_name],
-            text=True
-        )
-        return result.strip() or "Unknown version"
-    except subprocess.CalledProcessError:
-        return "Docker not available or image not found"
-
+def get_server_ip():
+    # Get the server's hostname and IP address
+    hostname = socket.gethostname()
+    server_ip = socket.gethostbyname(hostname)
+    return server_ip
 
 @app.route('/')
 def home():
     try:
         response = requests.get(f"{BACKEND_URL}/data")
         data = response.json()
-        version = get_docker_image_version()
+        server_ip = get_server_ip()
     except Exception as e:
         data = {"error": str(e)}
     return render_template("index.html", data=data)

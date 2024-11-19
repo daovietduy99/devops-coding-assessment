@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: canary-deployment
+spec:
+  project: default
+  source:
+    repoURL: "https://github.com/daovietduy99/devops-coding-assessment.git"
+    targetRevision: HEAD
+    path: canary-deployment
+  destination:
+    name: eks-dev
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+# apiVersion: argoproj.io/v1alpha1
+# kind: ApplicationSet
+# metadata:
+#   name: canary-deployment
+# spec:
+#   generators:
+#     - list:
+#         elements:
+#           - release: stable
+#             revision: 2.0.0
+#           - release: canary
+#             revision: 2.0.1
+#   template:
+#     metadata:
+#       name: "{{release}}-deployment"
+#     spec:
+#       project: default
+#       source:
+#         repoURL: "https://github.com/daovietduy99/devops-coding-assessment.git"
+#         targetRevision: "{{revision}}"
+#         path: "canary/{{release}}"
+#       destination:
+#         name: eks-dev
+#         namespace: default

@@ -1,0 +1,106 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-stable
+  labels:
+    app: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend
+      version: stable
+  template:
+    metadata:
+      labels:
+        app: frontend
+        version: stable
+    spec:
+      containers:
+        - name: frontend
+          image: 571515939637.dkr.ecr.ap-southeast-1.amazonaws.com/frontend:12481f6
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "100m"
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+          ports:
+            - containerPort: 5001
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-canary
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: frontend
+        version: canary
+    spec:
+      containers:
+        - name: frontend
+          image: 571515939637.dkr.ecr.ap-southeast-1.amazonaws.com/frontend:12481f6
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "100m"
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+          ports:
+            - containerPort: 5001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: canary
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: 571515939637.dkr.ecr.ap-southeast-1.amazonaws.com/frontend:12481f6
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "100m"
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+          ports:
+            - containerPort: 5001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: canary
+spec:
+  ports:
+    - port: 5001
+      targetPort: 5001
+  selector:
+    app: frontend
+  type: LoadBalancer
