@@ -89,6 +89,9 @@ jobs:
     needs: [EKS-deploy, ECR-deploy]
     name: Build and push Docker image
     runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.vars.outputs.sha }}
+      ecr_registry: ${{ steps.login-ecr.outputs.registry }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -119,8 +122,8 @@ jobs:
       - name: Set short git commit SHA and github tag to make decision whether build is for release or not
         id: vars
         run: |
-          calculatedSha=$(git rev-parse --short ${{ github.sha }})
-          echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
+          echo "::set-output name=sha::$(git rev-parse --short=7 ${{ github.sha }})"
+          echo "COMMIT_SHORT_SHA=$(git rev-parse --short=7 ${{ github.sha }})" >> $GITHUB_ENV
   
       - name: Print env vars
         run: |
@@ -128,43 +131,69 @@ jobs:
           echo "github.ref='${{ github.ref }}'"
           echo "github.event.base_ref='${{ github.event.base_ref }}'"
   
-      - name: Build web-app image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: webserver
-          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
-        run: |
-          # Build Docker image
-          cd backend/web-app
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+      # - name: Build web-app image
+      #   env:
+      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #     ECR_REPOSITORY: webserver
+      #     IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
+      #   run: |
+      #     # Build Docker image
+      #     cd backend/web-app
+      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
           
-      - name: Push web-app to Amazon ECR
-        id: build-web-app-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: webserver
-          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
-        run: |
-          # Push Docker image to Amazon ECR
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      # - name: Push web-app to Amazon ECR
+      #   id: build-web-app-image
+      #   env:
+      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #     ECR_REPOSITORY: webserver
+      #     IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
+      #   run: |
+      #     # Push Docker image to Amazon ECR
+      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Build app image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: appserver
-          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
-        run: |
-          # Build Docker image
-          cd backend/app-server
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+      # - name: Build app image
+      #   env:
+      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #     ECR_REPOSITORY: appserver
+      #     IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
+      #   run: |
+      #     # Build Docker image
+      #     cd backend/app-server
+      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
         
-      - name: Push app to Amazon ECR
-        id: build-app-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: appserver
-          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
-        run: |
-          # Push Docker image to Amazon ECR
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      # - name: Push app to Amazon ECR
+      #   id: build-app-image
+      #   env:
+      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #     ECR_REPOSITORY: appserver
+      #     IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
+      #   run: |
+      #     # Push Docker image to Amazon ECR
+      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
   
+  update-web-app-deployment:
+    needs: [build]
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Update Deployment Image
+        env:
+          ECR_REGISTRY: ${{ needs.build.outputs.ecr_registry }}
+          IMAGE_TAG: ${{ needs.build.outputs.sha }}
+        run: |
+          git pull --rebase origin main
+          IMAGE_TAG=${{ needs.build.outputs.sha }}
+          sed -i 's|image: '${{ env.ECR_REGISTRY }}/appserver':.*|image: '${{ env.ECR_REGISTRY }}/appserver':'"$IMAGE_TAG"'|' argocd/manifest/app-server.yml
+          sed -i 's|image: '${{ env.ECR_REGISTRY }}/webserver':.*|image: '${{ env.ECR_REGISTRY }}/webserver':'"$IMAGE_TAG"'|' argocd/manifest/web-app.yml
+          git add argocd/manifest
+          git commit -m "Update image versions to $IMAGE_TAG"
+          git push -u origin main
