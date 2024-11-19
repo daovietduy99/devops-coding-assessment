@@ -50,7 +50,7 @@ aws configure
         aws-region: ap-southeast-1
 ```
 ## Deployment Steps:
-### Provision Infrastructure: (refer EKS-deploy workflow job)
+### Provision Infrastructure: (refer `EKS-deploy` workflow job)
 Navigate to the `infra` folder and use Terraform to provision AWS resources:
 ```
 cd infra/ECR #(and EKS)
@@ -60,7 +60,7 @@ terraform apply --auto-approve
 ```
 This will create an EKS cluster and ECR to store Docker images
 
-### Build and Push Docker Images: (refer build workflow job)
+### Build and Push Docker Images: (refer `build` workflow job)
 Build the backend and frontend Docker images and push them to ECR:
 ```
 cd src
@@ -73,7 +73,7 @@ docker build -t <ecr-repo-frontend>:<tag> -f frontend/Dockerfile .
 docker push <ecr-repo-frontend>:<tag>
 ```
 
-### Update image tag for ArgoCD sync application with EKS cluster (refer: update-web-app-deployment workflow job)
+### Update image tag for ArgoCD sync application with EKS cluster (refer: `update-web-app-deployment` workflow job)
 Navigate to the `manifest` folder, and update every imageTag with latest pushed image
 
 ##Setup GitOps with ArgoCD
