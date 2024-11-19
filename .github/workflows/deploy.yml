@@ -17,7 +17,6 @@ permissions:
 jobs:
   EKS-deploy:
     name: Provision EKS infrastructure
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -52,7 +51,6 @@ jobs:
 
   ECR-deploy:
     name: Provision ECR
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
