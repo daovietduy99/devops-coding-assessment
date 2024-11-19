@@ -9,6 +9,7 @@ on:
     paths-ignore:
       - 'argocd/**'
       - 'manifest/**'
+      - 'canary-deployment/**'
       - 'README.md'
 
 permissions:
@@ -198,6 +199,7 @@ jobs:
 
   update-web-app-deployment:
     name: Bump image versions
+    if: github.ref == 'refs/heads/main'
     needs: [build]
     permissions:
       contents: write
