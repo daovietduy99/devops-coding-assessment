@@ -2,18 +2,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysql
+  name: mysql-db
   labels:
-    app: mysql
+    app: mysql-db
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mysql
+      app: mysql-db
   template:
     metadata:
       labels:
-        app: mysql
+        app: mysql-db
     spec:
       containers:
         - name: mysql
@@ -46,13 +46,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: mysql-db
 spec:
   ports:
     - port: 3306
       targetPort: 3306
   selector:
-    app: mysql
+    app: mysql-db
 ---
 # apiVersion: v1
 # kind: PersistentVolumeClaim
