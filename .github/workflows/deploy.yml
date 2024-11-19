@@ -131,45 +131,45 @@ jobs:
           echo "github.ref='${{ github.ref }}'"
           echo "github.event.base_ref='${{ github.event.base_ref }}'"
   
-      # - name: Build web-app image
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     ECR_REPOSITORY: webserver
-      #     IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
-      #   run: |
-      #     # Build Docker image
-      #     cd backend/web-app
-      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+      - name: Build web-app image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: webserver
+          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
+        run: |
+          # Build Docker image
+          cd backend/web-app
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
           
-      # - name: Push web-app to Amazon ECR
-      #   id: build-web-app-image
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     ECR_REPOSITORY: webserver
-      #     IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
-      #   run: |
-      #     # Push Docker image to Amazon ECR
-      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: Push web-app to Amazon ECR
+        id: build-web-app-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: webserver
+          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
+        run: |
+          # Push Docker image to Amazon ECR
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      # - name: Build app image
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     ECR_REPOSITORY: appserver
-      #     IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
-      #   run: |
-      #     # Build Docker image
-      #     cd backend/app-server
-      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+      - name: Build app image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: appserver
+          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
+        run: |
+          # Build Docker image
+          cd backend/app-server
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
         
-      # - name: Push app to Amazon ECR
-      #   id: build-app-image
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     ECR_REPOSITORY: appserver
-      #     IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
-      #   run: |
-      #     # Push Docker image to Amazon ECR
-      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: Push app to Amazon ECR
+        id: build-app-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: appserver
+          IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
+        run: |
+          # Push Docker image to Amazon ECR
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
   
   update-web-app-deployment:
     needs: [build]
