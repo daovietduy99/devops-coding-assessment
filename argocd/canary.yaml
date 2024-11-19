@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: canary-deployment
+  name: canary
 spec:
   project: default
   source:
