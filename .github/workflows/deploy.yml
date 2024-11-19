@@ -196,6 +196,7 @@ jobs:
 
       - name: Update Deployment Image
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ needs.build.outputs.sha }}
         run: |
