@@ -172,6 +172,8 @@ jobs:
   
   update-web-app-deployment:
     needs: [build]
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -196,7 +198,6 @@ jobs:
 
       - name: Update Deployment Image
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ needs.build.outputs.sha }}
         run: |
