@@ -83,3 +83,14 @@ Navigate to the `manifest` folder, and update the image tags with the latest pus
 ```
 kubectl apply -f argocd.yaml
 ```
+
+## Canary deployment with ArgoCD
+### Gradual Rollout
+Adjust the traffic percentage by increasing/decreasing the replicas for stable and canary Deployments. For instance:
+
+Start with stable: 3 and canary: 1 replicas.
+Gradually move to stable: 2 and canary: 2.
+
+### Rollback or Complete Deployment
+If issues are found, scale canary to 0 and restore stable replicas.
+If successful, scale down stable and increase canary replicas to handle 100% traffic
