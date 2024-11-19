@@ -144,9 +144,9 @@ jobs:
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             VERSION_TAG=${GITHUB_REF/refs\/tags\//}
             echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_ENV
-            TAGS="$VERSION_TAG,$COMMIT_SHA,latest"
+            TAGS="$VERSION_TAG,$COMMIT_SHA"
           else
-            TAGS="$COMMIT_SHA,latest"
+            TAGS="$COMMIT_SHA"
           fi
           echo "DOCKER_IMAGE_TAGS=$TAGS" >> $GITHUB_ENV
 
@@ -172,7 +172,6 @@ jobs:
             docker tag $ECR_REGISTRY/$ECR_REPOSITORY $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
           done
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
       - name: Build backend image
         id: build-backend-image
@@ -196,7 +195,6 @@ jobs:
             docker tag $ECR_REGISTRY/$ECR_REPOSITORY $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
           done
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
   update-web-app-deployment:
     name: Bump image versions
