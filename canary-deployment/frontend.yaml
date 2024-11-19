@@ -6,7 +6,7 @@ metadata:
   labels:
     app: frontend
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: frontend
@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 571515939637.dkr.ecr.ap-southeast-1.amazonaws.com/frontend:12481f6
+          image: 571515939637.dkr.ecr.ap-southeast-1.amazonaws.com/frontend:b6eaf9c
           resources:
             limits:
               memory: "256Mi"
