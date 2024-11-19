@@ -40,7 +40,7 @@ metadata:
   name: web-app-service
   namespace: web-app-namespace
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: web-app
   ports:

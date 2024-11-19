@@ -43,7 +43,7 @@ metadata:
   namespace: web-app-namespace
   name: app-server-service
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: app-server
   ports:
