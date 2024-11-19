@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apiservice
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: "https://github.com/daovietduy99/devops-coding-assessment.git"
+    path: argocd/manifests
+    targetRevision: main
+  destination:
+    name: "eks-dev"
+    namespace: default
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
