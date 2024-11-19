@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - "main"
-    paths:
-      - '!argocd/**'
+    paths-ignore:
+      - 'argocd/**'
 permissions:
   id-token: write
   contents: read
