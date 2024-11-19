@@ -10,7 +10,7 @@ spec:
     path: argocd/argocd-app
     targetRevision: main
   destination:
-    name: "eks-dev"
+    server: "https://kubernetes.default.svc"
     namespace: default
   syncPolicy:
     automated:
