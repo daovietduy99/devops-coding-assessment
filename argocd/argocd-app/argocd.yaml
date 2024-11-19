@@ -1,8 +1,8 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: assessment
-  namespace: default
+  name: argocd
+  namespace: argocd
 spec:
   project: default
   source:
@@ -11,7 +11,7 @@ spec:
     targetRevision: main
   destination:
     server: "https://kubernetes.default.svc"
-    namespace: default
+    namespace: argocd
   syncPolicy:
     automated:
       selfHeal: true

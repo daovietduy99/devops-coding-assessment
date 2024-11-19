@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: "https://github.com/daovietduy99/devops-coding-assessment.git"
-    path: argocd/manifests
+    path: argocd/manifest
     targetRevision: main
   destination:
     name: "eks-dev"
