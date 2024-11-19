@@ -10,7 +10,7 @@ spec:
     path: argocd/manifest
     targetRevision: main
   destination:
-    name: "eks-dev"
+    name: eks-dev
     namespace: default
   syncPolicy:
     automated:
