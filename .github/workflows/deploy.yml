@@ -3,7 +3,8 @@ on:
   push:
     branches:
       - "main"
-
+    paths-ignore:
+      - 'argocd/**'
 permissions:
   id-token: write
   contents: read
@@ -131,41 +132,43 @@ jobs:
           echo "github.ref='${{ github.ref }}'"
           echo "github.event.base_ref='${{ github.event.base_ref }}'"
   
-      - name: Build web-app image
+      - name: Build frontend image
+        id: build-frontend-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: webserver
+          ECR_REPOSITORY: frontend
           IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
         run: |
           # Build Docker image
-          cd backend/web-app
+          cd src/frontend
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
           
-      - name: Push web-app to Amazon ECR
-        id: build-web-app-image
+      - name: Push frontend to Amazon ECR
+        id: push-frontend-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: webserver
+          ECR_REPOSITORY: frontend
           IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
         run: |
           # Push Docker image to Amazon ECR
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Build app image
+      - name: Build backend image
+        id: build-backend-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: appserver
+          ECR_REPOSITORY: backend
           IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
         run: |
           # Build Docker image
-          cd backend/app-server
+          cd src/backend
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
         
-      - name: Push app to Amazon ECR
-        id: build-app-image
+      - name: Push backend to Amazon ECR
+        id: push-backend-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: appserver
+          ECR_REPOSITORY: backend
           IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
         run: |
           # Push Docker image to Amazon ECR
@@ -192,8 +195,8 @@ jobs:
         run: |
           git pull --rebase origin main
           IMAGE_TAG=${{ needs.build.outputs.sha }}
-          sed -i 's|image: '${{ env.ECR_REGISTRY }}/appserver':.*|image: '${{ env.ECR_REGISTRY }}/appserver':'"$IMAGE_TAG"'|' argocd/manifest/app-server.yml
-          sed -i 's|image: '${{ env.ECR_REGISTRY }}/webserver':.*|image: '${{ env.ECR_REGISTRY }}/webserver':'"$IMAGE_TAG"'|' argocd/manifest/web-app.yml
-          git add argocd/manifest
+          sed -i 's|image: '${{ env.ECR_REGISTRY }}/backend':.*|image: '${{ env.ECR_REGISTRY }}/backend':'"$IMAGE_TAG"'|' manifest/backend.yaml
+          sed -i 's|image: '${{ env.ECR_REGISTRY }}/frontend':.*|image: '${{ env.ECR_REGISTRY }}/frontend':'"$IMAGE_TAG"'|' manifest/frontend.yaml
+          git add *
           git commit -m "Update image versions to $IMAGE_TAG"
           git push -u origin main

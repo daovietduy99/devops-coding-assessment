@@ -1,7 +1,13 @@
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: web-app-namespace
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: web-app-namespace
   name: app-server
   labels:
     app: app-server
@@ -34,6 +40,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: web-app-namespace
   name: app-server-service
 spec:
   type: ClusterIP
@@ -43,3 +50,23 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-app-to-app-server
+  namespace: web-app-namespace
+spec:
+  podSelector:
+    matchLabels:
+      app: app-server
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: web-app
+      ports:
+        - protocol: TCP
+          port: 8080
+  policyTypes:
+    - Ingress

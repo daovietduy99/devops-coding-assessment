@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: apiservice
+  name: assessment
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: "https://github.com/daovietduy99/devops-coding-assessment.git"
-    path: argocd/manifests
+    path: argocd/argocd-app
     targetRevision: main
   destination:
-    name: "eks-dev"
-    namespace: default
+    server: "https://kubernetes.default.svc"
+    namespace: argocd
   syncPolicy:
     automated:
       selfHeal: true

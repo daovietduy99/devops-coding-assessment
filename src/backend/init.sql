@@ -1,0 +1,9 @@
+CREATE DATABASE IF NOT EXISTS demo_db;
+
+USE demo_db;
+
+CREATE TABLE IF NOT EXISTS demo_table (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    value FLOAT
+);
