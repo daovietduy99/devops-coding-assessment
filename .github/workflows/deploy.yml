@@ -135,7 +135,8 @@ jobs:
           IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
         run: |
           # Build Docker image
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile ./backend/web-app
+          cd backend/web-app
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
           
       - name: Push web-app to Amazon ECR
         id: build-web-app-image
@@ -154,7 +155,8 @@ jobs:
           IMAGE_TAG: ${{ env.COMMIT_SHORT_SHA }}
         run: |
           # Build Docker image
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile ./backend/app-server
+          cd backend/app-server
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
         
       - name: Push app to Amazon ECR
         id: build-app-image
