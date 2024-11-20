@@ -22,6 +22,22 @@ spec:
           env:
             - name: FLASK_ENV
               value: development
+            - secretKeyRef:
+                name: backend
+                key: DB_HOST
+              name: DB_HOST
+            - secretKeyRef:
+                name: backend
+                key: DB_NAME
+              name: DB_NAME
+            - secretKeyRef:
+                name: backend
+                key: DB_USER
+              name: DB_USER
+            - secretKeyRef:
+                name: backend
+                key: DB_PASSWORD
+              name: DB_PASSWORD
           resources:
             limits:
               memory: "128Mi"
@@ -59,3 +75,22 @@ spec:
         target:
           type: Utilization
           averageUtilization: 50
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: backend
+  namespace: default
+spec:
+  encryptedData:
+    DB_HOST: AgASLLZvcaQb2KBpEX1ahzaNIdk0U9nuG6FKtj1rlcMujXrXVMsyOWwxG7PnuzrOEsetmjWyOrP5rZpwIWStMJettqF7SS90sakgIlkcB6dhxaJBsCrkFEbgoWWmzy8LOfpv0+GtRa7l1zya0NPfrrCNJQT8qMJqsEZXyWCsWmIJjZBOBrelUtHZT+TJyUw1kPQ2kB9ZJ1Jg3yQjYJ0z38YLhlwWBT8FXxRhgxmA75MvvLySbTWVjIOr7Yq0viRb4F/QOQqbasulsl5EHUUAmIVFdphETdhBAhcb8fJxAdmlRkN0dsAi91dN9mhsrEJJ98ddivqz8pCeXjc5IfliPSGBAW1v8Q0cTndsuYUwVpwGdIggOoEFhr2na5vi98UG/VhEbwmRLJUIeXKHsbyrJwsyUtukUKqQBcaOTJYtNWCteLF/on9vpw1Ke4LWPbbhB9vdqv9xAcdUR2RQ3hQ7KmBsubxKVGdiN82nPw1IaTC5J+dz89oIjEXD8LJ7DPnzqT3j8hCUp4D1l2cRHcXqcbQ9o9FuWH/uPzUeh3fSA+kqrGWgoh7F8k7fo5bnxnMn1xhuYJpxYSUnp4AC3kwba8hoddr8fryle/sZ88VM6A5RLM1CL9vyA9SL7gaNkbAKqwbzHwudCHctyXXF3J1fVq/PiNKzNxgq8cCtAscyLqO9ErMMuD+zhtsn1Pbf0Mgx4xOCKP1GGkePLNM=
+    DB_NAME: AgAsL+e3Peo478Tfr3EfKKJAWEyayHByNmrc0RYHJd6Z3paPkSPFEX2biMbZrND5d4jFPCMLbFam6adU6B4PQYOiFrvV8n0TuOc3u4fcwXbNrhJq1zLSQAoR79JAKyz0Y7+/QBTVn7U71MrxTkaYZ/VEn8v5GAp0NOIj6jI2MF47gS6ZHjllwR0bHMGPiZHlefYWARp1fmJmi3BD9FY8SoC2pmFnqFPeCppniUZlIC0dFaTlrQzeFof9Gl0WO+H7186w7kGfoU1l+2ZEuU9rx+WuGO5FKA85Uc8ZZbjBgtpfOCVes4gy3k8yXMpcbtMjRDq69dey4bPFO8P2oxURCwLk7VLLcocdl7dLMgISzn94jJvPhBCZfCdruJvvIZgRkv3kqUHlzD43DWKxE30iP1j/xOx8ErDPhU+h8E5vBba4Xs5csEf7WUxNU4Uk5XkszXH4732gaa6WVSU3p290uhy049+3Z5Zg9c+OoMV6WCT1szk+EosPTBr84B9uV1ntGIttR//WhDLDRnOzTZW0T4F2pjA8T0uvzmRiLpJ34jOhGnxqZP/k1aEDF0kDMEmaSuloPar/xkx0Od8pOMokO50nkkY0i26+a9Mdp8xRZxiubJlmj9COQ534HF2JPx6/O4+0Vi3/ZVeuJeaG9qVL64UswLXm8mXotyIv3HhHVu3Uq++BGpDqjoYgRC0EDdAy/O8q/j210xliAw==
+    DB_USER: AgCTd4Rsxl4JDqk0T+KQLH7lzHVJKrIoterFT7Tjiktb2Hp+wIYuC3FvGX/KgoXssNmQuGTLLoIJ6TqWiXHRk54cbcRXHDGcr2nNnMz3Wp0AAtKRFJBxW4g8fyp+bRrDtt7Sjm+qKqw2c6qaGBy7ELdmPe5Ffn94Ib+/0Kcx62KBDpYmiXdpskYSl9GOD84KWSz8hQkKIznM1Tfz8SHp48IWJWV70EUfEq/LgeoLGcHiq1RmuwzWjM5QiA7zbFjFs1BYqfr2rI/l9lSguRx264fbU8ao8m/8q2+rMNEpjZAUm5juE84j2vIoaa2lu3xeb6Ob9rFo7qCHZYqBau81nqjv+Pgu/pED3/7psP9hvR4IcwaJwPMosFlMUxNlvqraST5QiBrDTQOa01nDTrgPVEYOxVlk1uySjyRUnDjUuQeS1tspKM1MBgklg6PpVYgGa3IOAi+i3njC3hiJ0GlF8hccpP/X47817wCP/aCJDvGSTJYtWqgdyxToWA8xK8R2TBpDt6pHpHgbA73utzvxcBXS4OQ8lkvI7v5BHutMG99oNG9NnmmwC/WShvV5yrCKbiB7UCRql8jxNrec3gqtXWy3IxX8aqr1LqzAFBUoQ12T3tCZBuqH1qZsrkrTendKDMuu8eEE2Ufc5uS8Fe9bRypE10u9prlQpgJvakR8nXAEZ32jxbwImBN6vjkIkL1T9SbqHTLsxw==
+    DB_PASSWORD: AgAU6DBN2h6DQLc+w6h/n8RLPbX6W04vSfaIIRgbNYGSkiS2o0WDIwYIT7ZFLV6RuKL3JvbQiIe9117TleBsK16O75XjqTRFuN6ZMYawj56LdzvMxFMDRnVuzSGFtDNPPjz5zdFYpikylo1lv1jcyUC95ocpesa3Nibas//FXFxR3VTcb0jkk//QTMmqVNcrxgEiLSYZtxTbnTJTnHgtEY5eLJIXd0I2/m9pTNWrqco0tPXjq8WqNwAlsIynahEOdw4v4i68DpUUzdUTWHFDucqiAZNp7ojSY/3mIldgEjaIqbkj9qhkT5ASSQTIa9sUxDpEA329R5HMDS494Xaen/jrjyNTyjBSGy9gc0ycVOvP0CtMRKfK9wAoQ5yCt9sepUB7/cmEwWY0dJZJ0/h8wF27oEwnGdpryq4d1mqdm/LaTUU9pX48AlfHdBwXzpQ8Cv/FX58e9fBTCZ6bdwZqeKVuM4l7CnqItF9EQvboXc4ZLBpaSu6R6lYblod1axXUlw6rnLYLSHqldJgeOcHhGMreRK8v4QKiCZSHodnO5jm1usMUPN0qR2QnO/ERFTgaKZXTXfEfH9SFdQbBLZ8llzgo4q/ro7sKMSSEgl/Vx8Q9r0Q1qHybLfITxHnMQJPUZKRhDxQGg0d0BaKI0rmBJiWHS5ozDqsaaGDRemBXJaZO6OOJWQdp4d6Tu6Qiq702uDUe0gPlo8wFfi8=
+  template:
+    metadata:
+      creationTimestamp: null
+      name: backend
+      namespace: default
+    type: Opaque

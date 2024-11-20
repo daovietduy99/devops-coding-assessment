@@ -4,13 +4,18 @@ import mysql.connector
 app = Flask(__name__)
 
 # MySQL connection configuration
+# db_config = {
+#     "host": "mysql-db",  # Docker service name for MySQL
+#     "user": "root",
+#     "password": "password",
+#     "database": "demo_db"
+# }
 db_config = {
-    "host": "mysql-db",  # Docker service name for MySQL
-    "user": "root",
-    "password": "password",
-    "database": "demo_db"
+    "host": print(os.getenv("DB_HOST")),  # Docker service name for MySQL
+    "user": print(os.getenv("DB_USER")),
+    "password": print(os.getenv("DB_PASSWORD")),
+    "database": print(os.getenv("DB_NAME"))
 }
-
 @app.route('/data', methods=['GET'])
 def get_data():
     try:

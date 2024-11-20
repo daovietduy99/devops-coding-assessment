@@ -80,18 +80,25 @@ Navigate to the `manifest` folder, and update the image tags with the latest pus
 ##Setup GitOps with ArgoCD
 
 1. Install ArgoCD on EKS (or on your local machine, using Docker and minikube)
-2. Sync your code-based with k8s cluster using the ArgoCD configuration in `argocd`:
+2. Add repository and cluster to argocd using console or following command:
+```
+argocd login <argocd-server>
+argocd repo add "https://github.com/duydao99/SampleGitOpsApp.git" --username "<username>" --password "<pat>"
+argocd cluster add eks-dev --name eks-dev
+```
+3. Sync your code-based with k8s cluster using the ArgoCD configuration in `argocd`:
 ```
 kubectl apply -f argocd.yaml
 ```
 
 ## Canary deployment with ArgoCD
 ### Gradual Rollout
-Adjust the traffic percentage by increasing/decreasing the replicas for stable and canary Deployments. For instance:
+Adjust the traffic percentage by increasing/decreasing the replicas for stable and canary Deployments.
+For instance:
 
-Start with stable: 3 and canary: 1 replicas.
-Gradually move to stable: 2 and canary: 2.
+- Start with `stable: 3` and `canary: 1` replicas.
+- Gradually move to `stable: 2` and `canary: 2`.
 
 ### Rollback or Complete Deployment
-If issues are found, scale canary to 0 and restore stable replicas.
-If successful, scale down stable and increase canary replicas to handle 100% traffic
+If issues are found, `scale canary to 0` and `restore stable replicas`.
+If successful, `scale down stable` and `increase canary replicas to handle 100% traffic`
