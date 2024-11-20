@@ -6,7 +6,7 @@ metadata:
   labels:
     app: canary
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: canary
@@ -38,7 +38,7 @@ metadata:
   labels:
     app: canary
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: canary
