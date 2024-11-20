@@ -12,10 +12,10 @@ app = Flask(__name__)
 #     "database": "demo_db"
 # }
 db_config = {
-    "host": print(os.getenv("DB_HOST")),  # Docker service name for MySQL
-    "user": print(os.getenv("DB_USER")),
-    "password": print(os.getenv("DB_PASSWORD")),
-    "database": print(os.getenv("DB_NAME"))
+    "host": os.getenv("DB_HOST"),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "database": os.getenv("DB_NAME")
 }
 @app.route('/data', methods=['GET'])
 def get_data():
