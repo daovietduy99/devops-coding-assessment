@@ -24,7 +24,7 @@ spec:
             - secretKeyRef:
                 name: backend
                 key: DB_PASSWORD
-              name: DB_PASSWORD
+              name: MYSQL_ROOT_PASSWORD
           resources:
             limits:
               memory: "512Mi"
