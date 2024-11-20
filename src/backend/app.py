@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, request
 import mysql.connector
 import os
+import logging
 
 app = Flask(__name__)
+app.debug = True
 
 # MySQL connection configuration
 # db_config = {
@@ -17,6 +19,11 @@ db_config = {
     "password": os.getenv("DB_PASSWORD"),
     "database": os.getenv("DB_NAME")
 }
+    
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logging.info("DB_CONFIG: %s", db_config)
+
 @app.route('/data', methods=['GET'])
 def get_data():
     try:
