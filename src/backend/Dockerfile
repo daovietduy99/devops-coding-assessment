@@ -3,7 +3,7 @@ FROM python:3.9-slim-bullseye AS builder
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y vim && apt-get install -y --no-install-recommends \
     gcc libpq-dev && \
     useradd -m appuser && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
